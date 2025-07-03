@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Room - Interactive Portfolio</title>
+    
+    <!-- Favicon and Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/icon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/icon/favicon-16x16.png">
+    <link rel="manifest" href="./assets/icon/site.webmanifest">
+    <link rel="shortcut icon" href="./assets/icon/favicon.ico">
+    
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="three-canvas"></canvas>
+        
+        <!-- Loading screen -->
+        <div id="loading-screen">
+            <div class="loader">
+                <div class="spinner"></div>
+                <p>Loading My Room...</p>
+            </div>
+        </div>
+        
+        <!-- Computer screen overlay -->
+        <div id="computer-screen" class="computer-screen hidden">
+            <div class="screen-header">
+                <div class="screen-controls">
+                    <button class="screen-btn close-btn" id="close-screen">×</button>
+                    <button class="screen-btn minimize-btn">−</button>
+                    <button class="screen-btn maximize-btn">□</button>
+                </div>
+                <div class="screen-title">My Portfolio</div>
+            </div>
+            <div class="screen-content">
+                <div class="browser-tabs">
+                    <div class="tab active" data-tab="about">About</div>
+                    <div class="tab" data-tab="projects">Projects</div>
+                    <div class="tab" data-tab="contact">Contact</div>
+                </div>
+                <div class="browser-content">
+                    <div class="tab-content active" id="about">
+                        <h2>About Me</h2>
+                        <p>Welcome to my interactive 3D room portfolio! I'm a developer passionate about creating immersive digital experiences.</p>
+                        <p>This room represents my personal space where creativity and technology meet. Feel free to explore and interact with the computer to learn more about me.</p>
+                    </div>
+                    <div class="tab-content" id="projects">
+                        <h2>My Projects</h2>
+                        <div class="project-grid">
+                            <div class="project-card">
+                                <h3>3D Room Portfolio</h3>
+                                <p>This interactive 3D room built with Three.js and Vite</p>
+                            </div>
+                            <div class="project-card">
+                                <h3>Web Applications</h3>
+                                <p>Various web applications using modern frameworks</p>
+                            </div>
+                            <div class="project-card">
+                                <h3>3D Graphics</h3>
+                                <p>Experiments with 3D graphics and WebGL</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="contact">
+                        <h2>Get In Touch</h2>
+                        <p>I'd love to hear from you! Reach out through any of these channels:</p>
+                        <div class="contact-links">
+                            <a href="mailto:your.email@example.com">Email</a>
+                            <a href="https://github.com/yourusername">GitHub</a>
+                            <a href="https://linkedin.com/in/yourprofile">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div id="instructions">
+            <p>Click and drag to look around • Scroll to zoom • Click on the computer screen to interact • Use ESC to close screen • Press P for screen position demo</p>
+        </div>
+    </div>
+    
+    <script type="module" src="/main.js"></script>
+</body>
+</html> 
