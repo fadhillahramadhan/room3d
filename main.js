@@ -3,11 +3,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
-// Add your own CSS3D imports here
+import {
+	CSS3DObject,
+	CSS3DRenderer,
+} from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 
 class RoomPortfolio {
 	constructor() {
 		this.scene = new THREE.Scene();
+		this.css3dScene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
 			75,
 			window.innerWidth / window.innerHeight,
@@ -18,7 +22,7 @@ class RoomPortfolio {
 			canvas: document.getElementById('three-canvas'),
 			antialias: true,
 		});
-		// Add your own CSS3D renderer here
+		this.css3dRenderer = new CSS3DRenderer();
 		this.controls = null;
 		this.roomModel = null;
 		this.chairModel = null;
@@ -44,6 +48,7 @@ class RoomPortfolio {
 		this.setupControls();
 		this.loadRoom();
 		this.loadChair();
+		this.setupScreens();
 		this.setupEventListeners();
 		this.animate();
 	}
@@ -58,7 +63,13 @@ class RoomPortfolio {
 		this.renderer.toneMappingExposure = 1.0; // Balanced exposure for realistic lighting
 		this.renderer.physicallyCorrectLights = true; // Enable physically correct lighting for Blender lights
 
-		// Add your own CSS3D renderer setup here
+		// CSS3D renderer setup
+		this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
+		this.css3dRenderer.domElement.style.position = 'absolute';
+		this.css3dRenderer.domElement.style.top = '0px';
+		this.css3dRenderer.domElement.style.pointerEvents = 'none';
+		this.css3dRenderer.domElement.style.zIndex = '10';
+		document.body.appendChild(this.css3dRenderer.domElement);
 	}
 
 	setupLights() {
@@ -109,6 +120,28 @@ class RoomPortfolio {
 		this.lights.neon2 = neonLight2;
 
 		// Optional: Add some point lights for shadows (since RectAreaLight doesn't cast shadows)
+	}
+
+	setupScreens() {
+		this.screens = [];
+
+		// Create CSS3D group for screens
+		var group = new THREE.Group();
+
+		// Create a prominent screen positioned where it's easy to see
+		const screen1 = this.createElement('portfolio', -0.45, 1.91, 0.1, 0);
+
+		// Scale the screen to a reasonable size
+		screen1.scale.set(0.005, 0.005, 0.005);
+
+		group.add(screen1);
+
+		this.css3dScene.add(group);
+		this.screens.push(screen1);
+
+		console.log(
+			'🖥️ Screen created at position (0, 1.5, -2) with scale 0.005'
+		);
 	}
 
 	// Manual light positioning helpers
@@ -357,12 +390,186 @@ class RoomPortfolio {
 		);
 	}
 
+	createElement(id, x, y, z, ry) {
+		// Create screen container with proper styling
+		var div = document.createElement('div');
+		div.style.width = '130px';
+		div.style.height = '55px';
+		div.style.backgroundColor = '#000';
+		div.style.border = '3px solid #333';
+		div.style.borderRadius = '8px';
+		div.style.overflow = 'hidden';
+		div.style.boxShadow = '0 0 20px rgba(0,150,255,0.5)';
+		div.style.position = 'relative';
+		div.style.pointerEvents = 'auto';
+		// z-index 100
+		div.style.zIndex = '100';
+
+		// Create iframe with proper settings
+		var iframe = document.createElement('iframe');
+		iframe.style.width = '722px';
+		iframe.style.height = '305px';
+		iframe.style.border = 'none';
+		iframe.style.display = 'block';
+		iframe.style.position = 'absolute';
+		iframe.style.top = '0';
+		iframe.style.left = '0';
+		iframe.style.transform = 'scale(0.18)';
+		iframe.style.transformOrigin = '0 0';
+		iframe.style.imageRendering = 'crisp-edges';
+		iframe.style.imageRendering = '-webkit-crisp-edges';
+		iframe.style.imageRendering = 'pixelated';
+
+		// Try the website first, with fallback content
+		iframe.src = 'https://fadhillahramadhan.github.io/';
+
+		// Handle iframe load errors
+		iframe.onerror = () => {
+			console.log('Failed to load website, showing fallback content');
+			this.showFallbackContent(div);
+		};
+
+		// Check if iframe loads successfully
+		iframe.onload = () => {
+			try {
+				// Test if we can access the iframe content
+				iframe.contentWindow.document;
+				console.log('Website loaded successfully');
+			} catch (e) {
+				console.log(
+					'Website blocks iframe embedding, showing fallback'
+				);
+				this.showFallbackContent(div);
+			}
+		};
+
+		div.appendChild(iframe);
+
+		// Create CSS3D object
+		var object = new CSS3DObject(div);
+		object.position.set(x, y, z);
+		object.rotation.y = ry;
+
+		return object;
+	}
+
+	showFallbackContent(div) {
+		// Clear existing content
+		div.innerHTML = '';
+
+		// Create fallback content
+		var fallbackDiv = document.createElement('div');
+		fallbackDiv.style.width = '100%';
+		fallbackDiv.style.height = '100%';
+		fallbackDiv.style.backgroundColor = '#1a1a1a';
+		fallbackDiv.style.color = '#00ff00';
+		fallbackDiv.style.display = 'flex';
+		fallbackDiv.style.flexDirection = 'column';
+		fallbackDiv.style.justifyContent = 'center';
+		fallbackDiv.style.alignItems = 'center';
+		fallbackDiv.style.fontFamily = 'monospace';
+		fallbackDiv.style.fontSize = '14px';
+		fallbackDiv.style.textAlign = 'center';
+		fallbackDiv.style.padding = '20px';
+
+		fallbackDiv.innerHTML = `
+			<div style="font-size: 8px; color: #00ff00; text-align: center; margin-top: 5px;">
+				🖥️ SCREEN
+			</div>
+			<div style="font-size: 6px; color: #888; text-align: center; margin-top: 2px;">
+				fadhillahramadhan.github.io
+			</div>
+			<div style="margin-top: 8px; text-align: center;">
+				<button onclick="window.open('https://fadhillahramadhan.github.io/', '_blank')" 
+					style="background: #00ff00; color: #000; border: none; padding: 2px 6px; 
+					cursor: pointer; border-radius: 2px; font-family: monospace; font-size: 6px;">
+					OPEN
+				</button>
+			</div>
+		`;
+
+		div.appendChild(fallbackDiv);
+	}
+
+	createScreen(id, x, y, z, ry) {
+		return this.createElement(id, x, y, z, ry);
+	}
+
+	// Helper method to position screens
+	positionScreen(screenIndex, x, y, z, scale = 0.005) {
+		if (this.screens[screenIndex]) {
+			this.screens[screenIndex].position.set(x, y, z);
+			this.screens[screenIndex].scale.set(scale, scale, scale);
+			console.log(
+				`🖥️ Screen ${screenIndex} positioned at (${x}, ${y}, ${z}) with scale ${scale}`
+			);
+		} else {
+			console.warn(`Screen ${screenIndex} not found`);
+		}
+	}
+
+	// Helper method to rotate screens
+	rotateScreen(screenIndex, x, y, z) {
+		if (this.screens[screenIndex]) {
+			this.screens[screenIndex].rotation.set(x, y, z);
+			console.log(
+				`🖥️ Screen ${screenIndex} rotated to (${x}, ${y}, ${z})`
+			);
+		} else {
+			console.warn(`Screen ${screenIndex} not found`);
+		}
+	}
+
+	// Show current screen positions
+	showScreenPositions() {
+		console.log('🖥️ Current Screen Positions:');
+		this.screens.forEach((screen, index) => {
+			const pos = screen.position;
+			const rot = screen.rotation;
+			const scale = screen.scale;
+			console.log(
+				`Screen ${index}: Position(${pos.x.toFixed(2)}, ${pos.y.toFixed(
+					2
+				)}, ${pos.z.toFixed(2)}) Rotation(${rot.x.toFixed(
+					2
+				)}, ${rot.y.toFixed(2)}, ${rot.z.toFixed(
+					2
+				)}) Scale(${scale.x.toFixed(4)})`
+			);
+		});
+	}
+
+	// Demo different screen positions
+	demoScreenPositions() {
+		console.log(
+			'🖥️ Demo Screen Positions - Press P again to cycle through positions'
+		);
+		if (!this.demoIndex) this.demoIndex = 0;
+
+		const positions = [
+			{ x: 0, y: 1.5, z: -2, scale: 0.005 }, // Front wall
+			{ x: 2, y: 1.5, z: 0, scale: 0.004 }, // Right wall
+			{ x: -2, y: 1.5, z: 0, scale: 0.004 }, // Left wall
+			{ x: 0, y: 2.5, z: -1, scale: 0.003 }, // High on front wall
+			{ x: 1, y: 0.8, z: -1, scale: 0.002 }, // Lower right
+		];
+
+		const pos = positions[this.demoIndex % positions.length];
+		this.positionScreen(0, pos.x, pos.y, pos.z, pos.scale);
+
+		this.demoIndex++;
+		console.log(
+			`Position ${this.demoIndex}/${positions.length}: Use window.roomPortfolio.positionScreen(0, ${pos.x}, ${pos.y}, ${pos.z}, ${pos.scale}) to set manually`
+		);
+	}
+
 	setupEventListeners() {
 		// Handle window resize
 		window.addEventListener('resize', () => {
 			this.camera.aspect = window.innerWidth / window.innerHeight;
 			this.camera.updateProjectionMatrix();
 			this.renderer.setSize(window.innerWidth, window.innerHeight);
+			this.css3dRenderer.setSize(window.innerWidth, window.innerHeight);
 		});
 
 		// Handle keyboard shortcuts
@@ -374,6 +581,12 @@ class RoomPortfolio {
 					break;
 				case 'h':
 					this.clearLightHelpers();
+					break;
+				case 's':
+					this.showScreenPositions();
+					break;
+				case 'p':
+					this.demoScreenPositions();
 					break;
 				// Chair animation controls
 			}
@@ -404,7 +617,9 @@ class RoomPortfolio {
 			this.controls.update();
 		}
 
+		// Render both WebGL and CSS3D scenes
 		this.renderer.render(this.scene, this.camera);
+		this.css3dRenderer.render(this.css3dScene, this.camera);
 	}
 }
 
